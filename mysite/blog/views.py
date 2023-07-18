@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Post
-from django.http import Http404
+from django.http import Http404, HttpResponse
 # Create your views here.
 
 def post_detail(request, id):
@@ -12,7 +12,7 @@ def post_detail(request, id):
                   {'post':post})
 
 def post_list(request):
-    post = Post.published.all()
+    posts = Post.published.all()
     return render(request,
-                  'blog/post/list/html',
-                  {'posts': posts})
+                  'blog/post/list.html',
+                  {'posts':posts})

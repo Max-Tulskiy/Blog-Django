@@ -61,3 +61,10 @@ class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True) # создает метку при создании строки в базе
     updated = models.DateTimeField(auto_now=True) # обновляет метку
     active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['created']
+        indexes = [models.Index(fields=['created']),]
+
+    def __str__(self):
+        return f"Comment by {self.name} on {self.post}"

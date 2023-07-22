@@ -8,6 +8,8 @@ class PublishedManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset()\
             .filter(status=Post.Status.PUBLISHED) # super не полностью переопределяет метод объекта
+
+
 class Post(models.Model):
 
     objects = models.Manager() #менеджер по умолчанию
@@ -48,3 +50,14 @@ class Post(models.Model):
                              self.publish.month,
                              self.publish.day,
                              self.slug])
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post,
+                             on_delete=models.CASCADE, # если пост удалится, то из базы удалися вся информация с ним связанная
+                             related_name='comments') # обращение из связанных объектов к тем, от которых эта связь была создана
+    name = models.CharField(max_length=80)
+    email = models.EmailField()
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True) # создает метку при создании строки в базе
+    updated = models.DateTimeField(auto_now=True) # обновляет метку
+    active = models.BooleanField(default=True)

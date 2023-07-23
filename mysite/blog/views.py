@@ -1,18 +1,35 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Post
+from .models import Post, Comment
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger  # Постраничная разбивка
 from django.views.generic import ListView
-from .forms import EmailPostForm
+from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail
+from django.views.decorators.http import require_POST
+
 
 # Create your views here.
+
+
+@require_POST
+def post_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id, status=Post.Status.PUBLISHED)
+    comment = None
+
+    form = CommentForm(data=request.POST)
+
+    if form.is_valid():
+        comment = form.save(commit=False)  # создание объекта класса Comment не сохраняя его в бд
+        comment.post = post  # назначение поста комментария
+        comment.save()  # сохранение комментария в бд
+
+    return render(request, 'blog/post/comment.html', {'post': post, 'form': form, 'comment': comment})
+
 
 class PostListView(ListView):
     queryset = Post.published.all()
     context_object_name = 'posts'
     paginate_by = 3
     template_name = 'blog/post/list.html'
-
 
 
 def post_detail(request, year, month, day, post):
@@ -46,6 +63,7 @@ def post_list(request):
                   {'posts': posts})
 
 '''
+
 
 def post_share(request, post_id):
     # Извлекаем пост по id

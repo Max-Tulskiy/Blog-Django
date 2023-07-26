@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
+from taggit.managers import TaggableManager
 # Create your models here.
 
 class PublishedManager(models.Manager):
@@ -15,7 +16,7 @@ class Post(models.Model):
     objects = models.Manager() #менеджер по умолчанию
     published = PublishedManager() #конкретно-прикладной менеджер
 
-
+    tags = TaggableManager()
 
     class Status(models.TextChoices):
         DRAFT = 'DF', 'Draft'
@@ -55,6 +56,7 @@ class Comment(models.Model):
     post = models.ForeignKey(Post,
                              on_delete=models.CASCADE, # если пост удалится, то из базы удалися вся информация с ним связанная
                              related_name='comments') # обращение из связанных объектов к тем, от которых эта связь была создана
+
     name = models.CharField(max_length=80)
     email = models.EmailField()
     body = models.TextField()
